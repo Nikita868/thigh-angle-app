@@ -97,7 +97,7 @@ with col5:
         st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
         st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
         st.session_state.show_how = False
-        st.experimental_rerun()
+        st.rerun()
 
 # Explanation and plot
 if st.session_state.show_how:
