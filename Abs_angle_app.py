@@ -20,9 +20,10 @@ def calculate_absolute_angle(proximal_x, proximal_y, distal_x, distal_y):
     angle_rad = math.atan2(delta_y, delta_x)
     angle_deg = math.degrees(angle_rad)
 
+    # Apply quadrant correction
     if delta_x > 0 and delta_y >= 0:  # Quadrant 1
         pass
-    elif delta_x < 0:  # Quadrant 2 or 3
+    elif delta_x < 0:                # Quadrant 2 or 3
         angle_deg += 180
     elif delta_x > 0 and delta_y < 0:  # Quadrant 4
         angle_deg += 360
@@ -32,7 +33,7 @@ def calculate_absolute_angle(proximal_x, proximal_y, distal_x, distal_y):
 # Initialize session state
 if 'GTX' not in st.session_state:
     st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY = generate_coordinates()
-    st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.GTX, st.session_state.GTY)
+    st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
     st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
     st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
     st.session_state.correct_answers = 0
