@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 
 # Function to generate realistic walking coordinates
 def generate_coordinates():
-    GTX = round(random.uniform(-0.20, -0.18), 3)  # GT slightly behind
+    GTX = round(random.uniform(-0.21, -0.16), 3)
     GTY = round(random.uniform(0.90, 0.98), 3)
-    LEX = round(GTX + random.uniform(0.05, 0.07), 3)  # LE ahead of GT
-    LEY = round(random.uniform(0.45, 0.52), 3)  # lower Y
-    LMX = round(LEX + random.uniform(0.05, 0.08), 3)  # foot ahead of knee
-    LMY = round(random.uniform(0.08, 0.12), 3)  # lowest point
+    LEX = round(random.uniform(-0.15, -0.1), 3)
+    LEY = round(random.uniform(0.45, 0.52), 3)
+    LMX = round(random.uniform(-0.25, -0.15), 3)
+    LMY = round(random.uniform(0.08, 0.12), 3)
     return GTX, GTY, LEX, LEY, LMX, LMY
 
 # Function to calculate absolute angle from proximal to distal
