@@ -19,7 +19,7 @@ def calculate_absolute_angle(GTX, GTY, LEX, LEY):
     angle_rad = math.atan2(delta_y, delta_x)
     angle_deg = math.degrees(angle_rad)
     if angle_deg < 0:
-        angle_deg += 360
+        angle_deg += 180
     return round(angle_deg, 1)
 
 # Initialize session state if not already initialized
