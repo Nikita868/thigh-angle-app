@@ -36,7 +36,6 @@ if 'GTX' not in st.session_state:
     st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
     st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
     st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
-    st.session_state.knee_checked = False
     st.session_state.show_how = False
 
 st.title("Absolute Thigh Angle, Leg Angle, and Knee Flexion Practice App")
@@ -63,7 +62,7 @@ student_leg_angle = st.number_input("Your estimated absolute leg (shank) angle (
 student_knee_angle = st.number_input("Your estimated knee flexion angle (degrees):", step=0.1, key='knee')
 
 # Buttons
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     if st.button("Check Thigh Angle"):
@@ -85,12 +84,20 @@ with col3:
             st.success(f"✅ Correct! The knee flexion angle is {st.session_state.knee_angle:.1f}°.")
         else:
             st.error(f"❌ Incorrect. The correct knee flexion angle is {st.session_state.knee_angle:.1f}°.")
-        st.session_state.knee_checked = True
 
-# Show How to Calculate button
-if st.session_state.knee_checked:
+with col4:
     if st.button("Show How to Calculate"):
         st.session_state.show_how = True
+
+with col5:
+    if st.button("🔄 Try Another Problem"):
+        # Reset all key session variables
+        st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY = generate_coordinates()
+        st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
+        st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
+        st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
+        st.session_state.show_how = False
+        st.experimental_rerun()
 
 # Explanation and plot
 if st.session_state.show_how:
@@ -114,7 +121,7 @@ if st.session_state.show_how:
     st.latex(r"\text{Knee Angle} = \text{Thigh Angle} - \text{Leg Angle}")
 
     st.subheader("📈 Segment Plot")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(1, 4))  # Aspect ratio 4:1 (height 4, width 1)
     ax.plot([st.session_state.GTX, st.session_state.LEX], [st.session_state.GTY, st.session_state.LEY], 'bo-', label='Thigh (GT → LE)')
     ax.plot([st.session_state.LEX, st.session_state.LMX], [st.session_state.LEY, st.session_state.LMY], 'go-', label='Leg (LE → LM)')
     ax.text(st.session_state.GTX, st.session_state.GTY, 'GT', fontsize=9, ha='right')
@@ -123,17 +130,7 @@ if st.session_state.show_how:
     ax.set_xlabel('X Position (m)')
     ax.set_ylabel('Y Position (m)')
     ax.set_title('Segment Angles')
+    ax.set_aspect(4)  # set aspect ratio: 4 (height) : 1 (width)
     ax.grid(True)
     ax.legend()
     st.pyplot(fig)
-
-    # Try Another Problem button
-    if st.button("🔄 Try Another Problem"):
-        # Reset all key session variables
-        st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY = generate_coordinates()
-        st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
-        st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
-        st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
-        st.session_state.knee_checked = False
-        st.session_state.show_how = False
-        st.experimental_rerun()
