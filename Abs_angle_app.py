@@ -24,7 +24,7 @@ def calculate_absolute_angle(proximal_x, proximal_y, distal_x, distal_y):
     if delta_x > 0 and delta_y >= 0:  # Quadrant 1
         pass
     elif delta_x < 0:                # Quadrant 2 or 3
-        angle_deg += 180
+        angle_deg += 0
     elif delta_x > 0 and delta_y < 0:  # Quadrant 4
         angle_deg += 360
 
