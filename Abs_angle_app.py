@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 
 # Function to generate realistic walking coordinates
 def generate_coordinates():
-    GTX = round(random.uniform(-0.21, -0.16), 3)
+    GTX = round(random.uniform(.1, 0.2), 3)
     GTY = round(random.uniform(0.90, 0.98), 3)
-    LEX = round(random.uniform(-0.15, -0.1), 3)
+    LEX = round(random.uniform(.25, .30), 3)
     LEY = round(random.uniform(0.45, 0.52), 3)
-    LMX = round(random.uniform(-0.25, -0.15), 3)
+    LMX = round(random.uniform(.05, .1), 3)
     LMY = round(random.uniform(0.08, 0.12), 3)
     return GTX, GTY, LEX, LEY, LMX, LMY
 
