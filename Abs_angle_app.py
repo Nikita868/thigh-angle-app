@@ -13,10 +13,10 @@ def generate_coordinates():
     LMY = round(random.uniform(0.08, 0.12), 3)
     return GTX, GTY, LEX, LEY, LMX, LMY
 
-# Function to calculate absolute angle between two points with quadrant corrections
-def calculate_absolute_angle(x1, y1, x2, y2):
-    delta_x = x2 - x1
-    delta_y = y2 - y1
+# Function to calculate absolute angle between two points based on distal coordinate
+def calculate_absolute_angle(proximal_x, proximal_y, distal_x, distal_y):
+    delta_x = proximal_x - distal_x
+    delta_y = proximal_y - distal_y
     angle_rad = math.atan2(delta_y, delta_x)
     angle_deg = math.degrees(angle_rad)
 
@@ -105,8 +105,8 @@ st.markdown(f"**Score:** {st.session_state.correct_answers} correct out of {st.s
 # Explanation Section
 st.subheader("📚 How to Calculate:")
 st.markdown("**Absolute Thigh Angle:**")
-st.latex(r"\Delta x = LEX - GTX")
-st.latex(r"\Delta y = LEY - GTY")
+st.latex(r"\Delta x = GTX - LEX")
+st.latex(r"\Delta y = GTY - LEY")
 st.latex(r"\text{Absolute Thigh Angle} = \text{atan2}(\Delta y, \Delta x)")
 st.markdown("Apply quadrant correction:")
 st.markdown("- Quadrant 1 (Δx > 0, Δy > 0): no correction.")
@@ -114,8 +114,8 @@ st.markdown("- Quadrant 2 or 3 (Δx < 0): add 180°.")
 st.markdown("- Quadrant 4 (Δx > 0, Δy < 0): add 360°.")
 
 st.markdown("**Absolute Leg (Shank) Angle:**")
-st.latex(r"\Delta x = LMX - LEX")
-st.latex(r"\Delta y = LMY - LEY")
+st.latex(r"\Delta x = LEX - LMX")
+st.latex(r"\Delta y = LEY - LMY")
 st.latex(r"\text{Absolute Leg Angle} = \text{atan2}(\Delta y, \Delta x)")
 st.markdown("(Apply same quadrant corrections.)")
 
