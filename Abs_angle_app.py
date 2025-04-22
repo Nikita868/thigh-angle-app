@@ -3,17 +3,17 @@ import random
 import streamlit as st
 import matplotlib.pyplot as plt
 
-# Function to generate random coordinates
+# Function to generate realistic walking coordinates
 def generate_coordinates():
-    GTX = round(random.uniform(-0.25, -0.19), 3)
-    GTY = round(random.uniform(0.83, 0.98), 3)
-    LEX = round(random.uniform(-0.15, -0.1), 3)
-    LEY = round(random.uniform(0.48, 0.54), 3)
-    LMX = round(random.uniform(-0.25, -0.15), 3)
-    LMY = round(random.uniform(0.08, 0.12), 3)
+    GTX = round(random.uniform(-0.20, -0.18), 3)  # GT slightly behind
+    GTY = round(random.uniform(0.90, 0.98), 3)
+    LEX = round(GTX + random.uniform(0.05, 0.07), 3)  # LE ahead of GT
+    LEY = round(random.uniform(0.45, 0.52), 3)  # lower Y
+    LMX = round(LEX + random.uniform(0.05, 0.08), 3)  # foot ahead of knee
+    LMY = round(random.uniform(0.08, 0.12), 3)  # lowest point
     return GTX, GTY, LEX, LEY, LMX, LMY
 
-# Function to calculate absolute angle between two points based on distal coordinate
+# Function to calculate absolute angle from proximal to distal
 def calculate_absolute_angle(proximal_x, proximal_y, distal_x, distal_y):
     delta_x = proximal_x - distal_x
     delta_y = proximal_y - distal_y
@@ -29,7 +29,7 @@ def calculate_absolute_angle(proximal_x, proximal_y, distal_x, distal_y):
 
     return round(angle_deg, 1)
 
-# Initialize session state if not already initialized
+# Initialize session state
 if 'GTX' not in st.session_state:
     st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY = generate_coordinates()
     st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
@@ -38,30 +38,27 @@ if 'GTX' not in st.session_state:
     st.session_state.correct_answers = 0
     st.session_state.attempted_answers = 0
 
-# Title
 st.title("Absolute Thigh Angle, Leg Angle, and Knee Flexion Practice App")
 
-# Problem Statement
 st.subheader("Problem Statement")
 st.markdown("""
 The data below is (x,y) position coordinates of a person walking. Use the data table provided below to estimate the absolute angle of the thigh segment. Assume they are walking in the positive X direction. Report in degrees to one decimal place.
 """)
 
-# Display the Provided Coordinates
+# Show coordinates
 st.subheader("Provided Coordinates")
-coords = {
+st.table({
     "Anatomical Location": ["Greater Trochanter", "Lateral Epicondyle", "Lateral Malleolus"],
     "X Position (m)": [st.session_state.GTX, st.session_state.LEX, st.session_state.LMX],
     "Y Position (m)": [st.session_state.GTY, st.session_state.LEY, st.session_state.LMY]
-}
-st.table(coords)
+})
 
-# Inputs for student's estimated angles
+# Inputs
 student_thigh_angle = st.number_input("Your estimated absolute thigh angle (degrees):", step=0.1, key='thigh')
 student_leg_angle = st.number_input("Your estimated absolute leg (shank) angle (degrees):", step=0.1, key='leg')
 student_knee_angle = st.number_input("Your estimated knee flexion angle (degrees):", step=0.1, key='knee')
 
-# Buttons for individual checks
+# Buttons
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
@@ -99,40 +96,37 @@ with col4:
         st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
         st.experimental_rerun()
 
-# Display score
+# Score
 st.markdown(f"**Score:** {st.session_state.correct_answers} correct out of {st.session_state.attempted_answers} attempts")
 
-# Explanation Section
+# Explanation
 st.subheader("📚 How to Calculate:")
 st.markdown("**Absolute Thigh Angle:**")
 st.latex(r"\Delta x = GTX - LEX")
 st.latex(r"\Delta y = GTY - LEY")
-st.latex(r"\text{Absolute Thigh Angle} = \text{atan2}(\Delta y, \Delta x)")
+st.latex(r"\text{Thigh Angle} = \text{atan2}(\Delta y, \Delta x)")
 st.markdown("Apply quadrant correction:")
-st.markdown("- Quadrant 1 (Δx > 0, Δy > 0): no correction.")
-st.markdown("- Quadrant 2 or 3 (Δx < 0): add 180°.")
-st.markdown("- Quadrant 4 (Δx > 0, Δy < 0): add 360°.")
+st.markdown("- Quadrant 1: Δx > 0, Δy > 0 → no correction")
+st.markdown("- Quadrant 2/3: Δx < 0 → add 180°")
+st.markdown("- Quadrant 4: Δx > 0, Δy < 0 → add 360°")
 
-st.markdown("**Absolute Leg (Shank) Angle:**")
+st.markdown("**Absolute Leg Angle:**")
 st.latex(r"\Delta x = LEX - LMX")
 st.latex(r"\Delta y = LEY - LMY")
-st.latex(r"\text{Absolute Leg Angle} = \text{atan2}(\Delta y, \Delta x)")
-st.markdown("(Apply same quadrant corrections.)")
+st.latex(r"\text{Leg Angle} = \text{atan2}(\Delta y, \Delta x)")
+st.markdown("(Apply same correction rules.)")
 
 st.markdown("**Knee Flexion Angle:**")
-st.latex(r"\text{Knee Flexion Angle} = \text{Absolute Thigh Angle} - \text{Absolute Leg Angle}")
+st.latex(r"\text{Knee Angle} = \text{Thigh Angle} - \text{Leg Angle}")
 
-# Plot Section
-st.subheader("📈 Plot of the Segment Coordinates:")
+# Plot
+st.subheader("📈 Segment Plot")
 fig, ax = plt.subplots()
 ax.plot([st.session_state.GTX, st.session_state.LEX], [st.session_state.GTY, st.session_state.LEY], 'bo-', label='Thigh (GT → LE)')
 ax.plot([st.session_state.LEX, st.session_state.LMX], [st.session_state.LEY, st.session_state.LMY], 'go-', label='Leg (LE → LM)')
-
-# Label points
 ax.text(st.session_state.GTX, st.session_state.GTY, 'GT', fontsize=9, ha='right')
 ax.text(st.session_state.LEX, st.session_state.LEY, 'LE', fontsize=9, ha='left')
 ax.text(st.session_state.LMX, st.session_state.LMY, 'LM', fontsize=9, ha='left')
-
 ax.set_xlabel('X Position (m)')
 ax.set_ylabel('Y Position (m)')
 ax.set_title('Thigh and Leg Segments')
