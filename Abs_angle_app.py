@@ -13,14 +13,20 @@ def generate_coordinates():
     LMY = round(random.uniform(0.08, 0.12), 3)
     return GTX, GTY, LEX, LEY, LMX, LMY
 
-# Function to calculate absolute angle between two points
+# Function to calculate absolute angle between two points with quadrant corrections
 def calculate_absolute_angle(x1, y1, x2, y2):
     delta_x = x2 - x1
     delta_y = y2 - y1
     angle_rad = math.atan2(delta_y, delta_x)
     angle_deg = math.degrees(angle_rad)
-    if angle_deg < 0:
+
+    if delta_x > 0 and delta_y >= 0:  # Quadrant 1
+        pass
+    elif delta_x < 0:  # Quadrant 2 or 3
+        angle_deg += 180
+    elif delta_x > 0 and delta_y < 0:  # Quadrant 4
         angle_deg += 360
+
     return round(angle_deg, 1)
 
 # Initialize session state if not already initialized
@@ -28,25 +34,27 @@ if 'GTX' not in st.session_state:
     st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY = generate_coordinates()
     st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
     st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
-    st.session_state.knee_angle = st.session_state.thigh_angle - st.session_state.leg_angle
+    st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
     st.session_state.correct_answers = 0
     st.session_state.attempted_answers = 0
 
 # Title
 st.title("Absolute Thigh Angle, Leg Angle, and Knee Flexion Practice App")
 
+# Problem Statement
+st.subheader("Problem Statement")
+st.markdown("""
+The data below is (x,y) position coordinates of a person walking. Use the data table provided below to estimate the absolute angle of the thigh segment. Assume they are walking in the positive X direction. Report in degrees to one decimal place.
+""")
+
 # Display the Provided Coordinates
 st.subheader("Provided Coordinates")
-
 coords = {
     "Anatomical Location": ["Greater Trochanter", "Lateral Epicondyle", "Lateral Malleolus"],
     "X Position (m)": [st.session_state.GTX, st.session_state.LEX, st.session_state.LMX],
     "Y Position (m)": [st.session_state.GTY, st.session_state.LEY, st.session_state.LMY]
 }
-
 st.table(coords)
-
-st.markdown("Assume the person is walking in the positive X direction.")
 
 # Inputs for student's estimated angles
 student_thigh_angle = st.number_input("Your estimated absolute thigh angle (degrees):", step=0.1, key='thigh')
@@ -59,36 +67,36 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     if st.button("Check Thigh Angle"):
         st.session_state.attempted_answers += 1
-        if abs(student_thigh_angle - st.session_state.thigh_angle) <= 1.0:
+        if abs(student_thigh_angle - st.session_state.thigh_angle) <= 0.1:
             st.session_state.correct_answers += 1
-            st.success(f"✅ Correct! The absolute thigh angle is {st.session_state.thigh_angle}°.")
+            st.success(f"✅ Correct! The absolute thigh angle is {st.session_state.thigh_angle:.1f}°.")
         else:
-            st.error(f"❌ Incorrect. The correct absolute thigh angle is {st.session_state.thigh_angle}°.")
+            st.error(f"❌ Incorrect. The correct absolute thigh angle is {st.session_state.thigh_angle:.1f}°.")
 
 with col2:
     if st.button("Check Leg Angle"):
         st.session_state.attempted_answers += 1
-        if abs(student_leg_angle - st.session_state.leg_angle) <= 1.0:
+        if abs(student_leg_angle - st.session_state.leg_angle) <= 0.1:
             st.session_state.correct_answers += 1
-            st.success(f"✅ Correct! The absolute leg angle is {st.session_state.leg_angle}°.")
+            st.success(f"✅ Correct! The absolute leg angle is {st.session_state.leg_angle:.1f}°.")
         else:
-            st.error(f"❌ Incorrect. The correct absolute leg angle is {st.session_state.leg_angle}°.")
+            st.error(f"❌ Incorrect. The correct absolute leg angle is {st.session_state.leg_angle:.1f}°.")
 
 with col3:
     if st.button("Check Knee Angle"):
         st.session_state.attempted_answers += 1
-        if abs(student_knee_angle - st.session_state.knee_angle) <= 1.0:
+        if abs(student_knee_angle - st.session_state.knee_angle) <= 0.1:
             st.session_state.correct_answers += 1
-            st.success(f"✅ Correct! The knee flexion angle is {st.session_state.knee_angle}°.")
+            st.success(f"✅ Correct! The knee flexion angle is {st.session_state.knee_angle:.1f}°.")
         else:
-            st.error(f"❌ Incorrect. The correct knee flexion angle is {st.session_state.knee_angle}°.")
+            st.error(f"❌ Incorrect. The correct knee flexion angle is {st.session_state.knee_angle:.1f}°.")
 
 with col4:
     if st.button("New Problem"):
         st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY = generate_coordinates()
         st.session_state.thigh_angle = calculate_absolute_angle(st.session_state.GTX, st.session_state.GTY, st.session_state.LEX, st.session_state.LEY)
         st.session_state.leg_angle = calculate_absolute_angle(st.session_state.LEX, st.session_state.LEY, st.session_state.LMX, st.session_state.LMY)
-        st.session_state.knee_angle = st.session_state.thigh_angle - st.session_state.leg_angle
+        st.session_state.knee_angle = round(st.session_state.thigh_angle - st.session_state.leg_angle, 1)
         st.experimental_rerun()
 
 # Display score
@@ -100,11 +108,16 @@ st.markdown("**Absolute Thigh Angle:**")
 st.latex(r"\Delta x = LEX - GTX")
 st.latex(r"\Delta y = LEY - GTY")
 st.latex(r"\text{Absolute Thigh Angle} = \text{atan2}(\Delta y, \Delta x)")
+st.markdown("Apply quadrant correction:")
+st.markdown("- Quadrant 1 (Δx > 0, Δy > 0): no correction.")
+st.markdown("- Quadrant 2 or 3 (Δx < 0): add 180°.")
+st.markdown("- Quadrant 4 (Δx > 0, Δy < 0): add 360°.")
 
 st.markdown("**Absolute Leg (Shank) Angle:**")
 st.latex(r"\Delta x = LMX - LEX")
 st.latex(r"\Delta y = LMY - LEY")
 st.latex(r"\text{Absolute Leg Angle} = \text{atan2}(\Delta y, \Delta x)")
+st.markdown("(Apply same quadrant corrections.)")
 
 st.markdown("**Knee Flexion Angle:**")
 st.latex(r"\text{Knee Flexion Angle} = \text{Absolute Thigh Angle} - \text{Absolute Leg Angle}")
